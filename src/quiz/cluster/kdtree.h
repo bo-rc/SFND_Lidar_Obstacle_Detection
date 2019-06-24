@@ -1,6 +1,7 @@
 /* \author Aaron Brown */
 // Quiz on implementing kd tree
 
+#include <memory>
 #include "../../render/render.h"
 
 
@@ -9,26 +10,46 @@ struct Node
 {
 	std::vector<float> point;
 	int id;
-	Node* left;
-	Node* right;
+	std::unique_ptr<Node> left;
+	std::unique_ptr<Node> right;
 
 	Node(std::vector<float> arr, int setId)
-	:	point(arr), id(setId), left(NULL), right(NULL)
+	:	point(arr), id(setId), left(nullptr), right(nullptr)
 	{}
 };
 
+template<size_t Dim>
 struct KdTree
 {
-	Node* root;
+	std::unique_ptr<Node> root;
 
 	KdTree()
-	: root(NULL)
+	: root(nullptr)
 	{}
 
+	void _insert(std::unique_ptr<Node>& subroot, uint depth, std::vector<float> point, int id)
+	{
+		if (!subroot)
+		{
+			subroot = std::make_unique<Node>(point, id);
+		}
+		else
+		{
+			// current compare dimension
+			uint cd = depth % Dim;
+			if (point[id] < subroot->point[cd])
+				_insert(subroot->left, depth+1, point, id);
+			else
+			{
+				_insert(subroot->right, depth+1, point, id);
+			}
+		}
+
+	}
 	void insert(std::vector<float> point, int id)
 	{
-		// TODO: Fill in this function to insert a new point into the tree
-		// the function should create a new node and place correctly with in the root 
+		// node, depth, point, id
+		_insert(root, 0, point, id);
 
 	}
 
