@@ -109,3 +109,17 @@ void renderBox(pcl::visualization::PCLVisualizer::Ptr& viewer, BoxQ box, int id,
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, color.r, color.g, color.b, cubeFill);
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, opacity*0.3, cubeFill);
 }
+
+void renderPoint(pcl::visualization::PCLVisualizer::Ptr& viewer, std::vector<float> point, int id, Color color, float opacity, float size)
+{
+	Box visPoint;
+  	visPoint.x_min = point[0] - size;
+  	visPoint.x_max = point[0] + size;
+  	visPoint.y_min = point[1] - size;
+  	visPoint.y_max = point[1] + size;
+  	visPoint.z_min = point[2] - size;
+  	visPoint.z_max = point[2] + size;
+
+	std::string pid = "point"+std::to_string(id);
+	viewer->addCube(visPoint.x_min, visPoint.x_max, visPoint.y_min, visPoint.y_max, visPoint.z_min, visPoint.z_max, color.r, color.g, color.b, pid);
+}
