@@ -34,14 +34,15 @@ struct KdTree
 	{
 		if (subroot == nullptr)
 		{
-			std::cout << "inserting new node: " << id << std::endl;
+			std::cout << "inserting new node: " << id << 
+			" depth: " << depth << " point:[" << point[0] << "," << point[1] << "] " << std::endl;
 			subroot = std::make_unique<Node>(point, id);
 		}
 		else
 		{
 			// current compare dimension
 			uint cd = depth % Dim;
-			if (point[id] < subroot->point[cd])
+			if (point[cd] < subroot->point[cd])
 				_insert(subroot->left, depth+1, point, id);
 			else
 			{

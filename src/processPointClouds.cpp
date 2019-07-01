@@ -21,22 +21,53 @@ void ProcessPointClouds<PointT>::numPoints(typename pcl::PointCloud<PointT>::Ptr
     std::cout << cloud->points.size() << std::endl;
 }
 
+template <typename PointT>
+typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::ExcludeCloud(
+    typename pcl::PointCloud<PointT>::Ptr cloud, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
+{
+    auto cloudRegion = boost::make_shared<pcl::PointCloud<PointT>>();
+    
+    std::vector<int> indices;
+    pcl::CropBox<PointT> exclude(true);
+    exclude.setMin(minPoint);
+    exclude.setMax(maxPoint);
+    exclude.setInputCloud(cloud);
+    exclude.filter(indices);
+
+    auto inliers = boost::make_shared<pcl::PointIndices>();
+    std::for_each(indices.cbegin(), indices.cend(), 
+        [&](int idx){
+            inliers->indices.push_back(idx);
+            });
+    
+    pcl::ExtractIndices<PointT> extract;
+    extract.setInputCloud(cloud);
+    extract.setIndices(inliers);
+    extract.setNegative(true);
+    extract.filter(*cloudRegion);
+
+    return cloudRegion;
+}
 
 template<typename PointT>
-typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float filterRes, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
+typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(
+    typename pcl::PointCloud<PointT>::Ptr cloud, float filterRes, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
 {
+    pcl::VoxelGrid<PointT> vg;
+    auto cloudFilterd = boost::make_shared<pcl::PointCloud<PointT>>();
+    vg.setInputCloud(cloud);
+    vg.setLeafSize(filterRes, filterRes, filterRes);
+    vg.filter(*cloudFilterd);
 
-    // Time segmentation process
-    auto startTime = std::chrono::steady_clock::now();
+    auto cloudRegion = boost::make_shared<pcl::PointCloud<PointT>>();
 
-    // TODO:: Fill in the function to do voxel grid point reduction and region based filtering
+    pcl::CropBox<PointT> region(true);
+    region.setMin(minPoint);
+    region.setMax(maxPoint);
+    region.setInputCloud(cloudFilterd);
+    region.filter(*cloudRegion);
 
-    auto endTime = std::chrono::steady_clock::now();
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-    std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
-
-    return cloud;
-
+    return cloudRegion;
 }
 
 

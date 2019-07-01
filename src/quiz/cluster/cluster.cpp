@@ -126,15 +126,22 @@ int main ()
 	pcl::visualization::PCLVisualizer::Ptr viewer = initScene(window, 25);
 
 	// Create data
-	std::vector<std::vector<float>> points = { {-6.2,7}, {-6.3,8.4}, {-5.2,7.1}, {-5.7,6.3}, {7.2,6.1}, {8.0,5.3}, {7.2,7.1}, {0.2,-7.1}, {1.7,-6.9}, {-1.2,-7.2}, {2.2,-8.9} };
+	std::vector<std::vector<float>> points = { 
+		{-6.2,7}, {-6.3,8.4}, {-5.2,7.1}, {-5.7,6.3}, 
+		{7.2,6.1}, {8.0,5.3}, {7.2,7.1}, {0.2,-7.1}, 
+		{1.7,-6.9}, {-1.2,-7.2}, {2.2,-8.9} 
+	};
 	//std::vector<std::vector<float>> points = { {-6.2,7}, {-6.3,8.4}, {-5.2,7.1}, {-5.7,6.3} };
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData(points);
 
 	KdTree<2> tree;
   
-    for (int i=0; i<points.size(); ++i) 
-    	tree.insert(points[i],i); 
-
+    for (int i=0; i<points.size(); ++i)
+	{
+		std::cout << "[" << points[i][0] << "," << points[i][1] << "] ";
+		tree.insert(points[i],i);
+	} 
+    
   	int it = 0;
   	render2DTree(tree.root,viewer,window, it);
   
